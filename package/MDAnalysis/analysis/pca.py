@@ -220,7 +220,7 @@ class PCA(AnalysisBase):
             self.mean = np.zeros(self._n_atoms*3)
             self._calc_mean = True
         else:
-            self.mean = self._mean.positions
+            self.mean = self._mean.positions.ravel()
             self._calc_mean = False
 
         if self.n_frames == 1:
@@ -338,15 +338,15 @@ class PCA(AnalysisBase):
         start, stop, step = traj.check_slice_indices(start, stop, step)
         n_frames = len(range(start, stop, step))
 
-        dim = (n_components if n_components is not None else
-               self.p_components.shape[1])
+        #dim = (n_components if n_components is not None else
+        #       self.p_components.shape[1])
 
-        dot = np.zeros((n_frames, dim))
-
+        #dot = np.zeros((n_frames, dim))
+        dot = []
         for i, ts in enumerate(traj[start:stop:step]):
             xyz = atomgroup.positions.ravel() - self.mean
-            dot[i] = np.dot(xyz, self._p_components[:, :dim])
-
+            #dot[i] = np.dot(xyz, self._p_components[:, :dim])
+            dot.append(np.dot(xyz, self.p_components.transpose()[:, :n_components]))
         return dot
 
     @due.dcite(
